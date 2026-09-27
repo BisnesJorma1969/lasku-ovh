@@ -6,22 +6,94 @@ Raportti toimii kokonaan paikallisesti. Se ei lähetä laskuja tai niiden tietoj
 
 Palvelimet ryhmitellään pysyvällä OVH-resurssitunnuksella. Raportissa ryhmän otsikkona näytetään viimeisin laskulta löytyvä käyttäjän antama hostname. Verollisen ja verottoman näkymän voi vaihtaa raportin yläreunan kytkimestä. Suomen yleisen ALV-kannan muutos 24 prosentista 25,5 prosenttiin tarkistetaan 1.9.2024 alkaen; laskusummat säilytetään aina laskulle merkityn todellisen verokannan mukaisina ja mahdollinen poikkeama näytetään vain kyseisen laskun rivillä täsmäytetyissä lähteissä.
 
-## Asennus ja ajo uv:lla
+## Ennen ensimmäistä ajoa
+
+Työkalu vaatii Python 3.11:n tai uudemman. Kopioi käsiteltävät PDF-laskut projektin `input`-hakemistoon. Hakemiston alla saa olla myös alihakemistoja.
+
+Ensimmäinen asennus tarvitsee verkkoyhteyden Pythonin ja riippuvuuksien lataamiseen. Varsinainen raportin muodostaminen käsittelee laskut paikallisesti eikä lähetä niitä verkkoon.
+
+## Windows (suositeltu tapa: uv)
+
+Ohje toimii Windows 10:ssä ja Windows 11:ssä PowerShellillä.
+
+1. Avaa PowerShell projektihakemistossa. Resurssienhallinnassa voit avata projektihakemiston, napsauttaa osoiteriviä, kirjoittaa `powershell` ja painaa Enteriä. Vaihtoehtoisesti siirry hakemistoon komennolla:
+
+   ```powershell
+   cd "C:\polku\lasku-ovh"
+   ```
+
+2. Asenna `uv` Windowsin paketinhallinnalla:
+
+   ```powershell
+   winget install --id=astral-sh.uv -e
+   ```
+
+   Sulje PowerShell asennuksen jälkeen, avaa se uudelleen projektihakemistossa ja varmista asennus:
+
+   ```powershell
+   uv --version
+   ```
+
+3. Asenna projektin riippuvuudet. `uv` hankkii tarvittaessa myös sopivan Python-version:
+
+   ```powershell
+   uv sync
+   ```
+
+4. Lisää laskut `input`-hakemistoon ja muodosta raportti:
+
+   ```powershell
+   uv run ovh-report
+   ```
+
+5. Avaa valmis raportti oletusselaimessa:
+
+   ```powershell
+   Start-Process .\output\index.html
+   ```
+
+Kun lisäät tai poistat laskuja, raportin voi rakentaa uudelleen pelkällä `uv run ovh-report` -komennolla. Ohjelma lukee kaikki PDF:t uudelleen ja korvaa aiemman `output`-hakemiston vasta onnistuneen ajon lopuksi.
+
+### Windows ilman uv:ta
+
+Jos koneessa on jo Python 3.11 tai uudempi, voit käyttää Pythonin omaa virtuaaliympäristöä. Virtuaaliympäristöä ei tarvitse aktivoida, koska alla olevat komennot kutsuvat sen ohjelmia suoraan.
+
+PowerShell:
+
+```powershell
+py --version
+py -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e .
+.\.venv\Scripts\ovh-report.exe
+Start-Process .\output\index.html
+```
+
+Perinteinen komentokehote (`cmd.exe`):
+
+```bat
+py --version
+py -m venv .venv
+.venv\Scripts\python.exe -m pip install -e .
+.venv\Scripts\ovh-report.exe
+start "" output\index.html
+```
+
+Varmista `py --version` -tulosteesta, että käytössä on vähintään Python 3.11. Jos `py`-komentoa tai sopivaa Pythonia ei löydy, asenna vähintään Python 3.11 tai käytä yllä olevaa `uv`-tapaa. Jos juuri asennettua `uv`-komentoa ei löydy, avaa uusi PowerShell-ikkuna, jotta päivittynyt `PATH` tulee käyttöön.
+
+## Linux ja macOS (uv)
 
 ```bash
 uv sync
 uv run ovh-report
 ```
 
-## Asennus ja ajo venvillä
+## Linux ja macOS (venv)
 
 ```bash
-python3 -m venv .venv
+python3.11 -m venv .venv
 .venv/bin/python -m pip install -e .
 .venv/bin/ovh-report
 ```
-
-Windowsin komentokehotteessa viimeinen komento on `.venv\Scripts\ovh-report.exe`.
 
 Onnistuneen ajon jälkeen avaa `output/index.html` selaimessa. HTTP-palvelinta tai verkkoyhteyttä ei tarvita. `output/report.json` sisältää saman raporttiaineiston koneluettavassa muodossa. Raporttiin valittu lähde-PDF kopioidaan muuttamattomana polkuun `output/pdfs/VUOSI/LASKUNUMERO.pdf`, jotta laskulinkit toimivat koko output-hakemistoa siirrettäessä.
 
