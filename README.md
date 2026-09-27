@@ -14,15 +14,9 @@ Ensimmäinen asennus tarvitsee verkkoyhteyden Pythonin ja riippuvuuksien lataami
 
 ## Windows (suositeltu tapa: uv)
 
-Ohje toimii Windows 10:ssä ja Windows 11:ssä PowerShellillä.
+Suorita seuraavat komennot PowerShellissä projektihakemistossa.
 
-1. Avaa PowerShell projektihakemistossa. Resurssienhallinnassa voit avata projektihakemiston, napsauttaa osoiteriviä, kirjoittaa `powershell` ja painaa Enteriä. Vaihtoehtoisesti siirry hakemistoon komennolla:
-
-   ```powershell
-   cd "C:\polku\lasku-ovh"
-   ```
-
-2. Asenna `uv` Windowsin paketinhallinnalla:
+1. Asenna `uv` Windowsin paketinhallinnalla:
 
    ```powershell
    winget install --id=astral-sh.uv -e
@@ -34,19 +28,19 @@ Ohje toimii Windows 10:ssä ja Windows 11:ssä PowerShellillä.
    uv --version
    ```
 
-3. Asenna projektin riippuvuudet. `uv` hankkii tarvittaessa myös sopivan Python-version:
+2. Asenna projektin riippuvuudet. `uv` hankkii tarvittaessa myös sopivan Python-version:
 
    ```powershell
    uv sync
    ```
 
-4. Lisää laskut `input`-hakemistoon ja muodosta raportti:
+3. Lisää laskut `input`-hakemistoon ja muodosta raportti:
 
    ```powershell
    uv run ovh-report
    ```
 
-5. Avaa valmis raportti oletusselaimessa:
+4. Avaa valmis raportti oletusselaimessa:
 
    ```powershell
    Start-Process .\output\index.html
