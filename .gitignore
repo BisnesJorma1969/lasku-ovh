@@ -1,6 +1,6 @@
 .venv/
 output/
-input/*.pdf
+input/
 OVHcloud-*.csv
 __pycache__/
 .pytest_cache/
