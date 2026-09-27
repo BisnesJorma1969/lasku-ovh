@@ -1,18 +1,40 @@
 # OVHcloud-laskuraportti
 
-Työkalu lukee hakemiston OVHcloudin PDF-laskut, täsmäyttää niiden summat ja muodostaa kuukausittaisen palveluraportin. Palvelumaksut jaetaan palvelujakson päivien mukaan kalenterikuukausille. Samaan dedikoituun palvelimeen liittyvät vuokra-, laitteisto-, kaista-, asennus- ja alennusrivit esitetään yhtenä kustannusryhmänä.
+OVHcloud-laskuraportti lukee hakemiston PDF-laskut, täsmäyttää niiden summat ja muodostaa kuukausittaisen palveluraportin. Raportti toimii sellaisenaan selaimessa ilman HTTP-palvelinta.
 
-Raportti toimii kokonaan paikallisesti. Se ei lähetä laskuja tai niiden tietoja verkkoon.
+[![OVHcloud-laskuraportin yläosa](docs/images/ovh-report-demo-top.png)](docs/images/ovh-report-demo-full.png)
 
-Palvelimet ryhmitellään pysyvällä OVH-resurssitunnuksella. Raportissa ryhmän otsikkona näytetään viimeisin laskulta löytyvä käyttäjän antama hostname. Verollisen ja verottoman näkymän voi vaihtaa raportin yläreunan kytkimestä. Suomen yleisen ALV-kannan muutos 24 prosentista 25,5 prosenttiin tarkistetaan 1.9.2024 alkaen; laskusummat säilytetään aina laskulle merkityn todellisen verokannan mukaisina ja mahdollinen poikkeama näytetään vain kyseisen laskun rivillä täsmäytetyissä lähteissä.
+Kuvissa käytetään synteettistä esimerkkiaineistoa. Summat ja tuoterivit vastaavat todellista hintatasoa, mutta lasku-, palvelin-, hostname- ja IP-tunnisteet eivät ole oikeita.
 
-## Ennen ensimmäistä ajoa
+## Toimintaperiaate
 
-Työkalu vaatii Python 3.11:n tai uudemman. Kopioi käsiteltävät PDF-laskut projektin `input`-hakemistoon. Hakemiston alla saa olla myös alihakemistoja.
+Palvelumaksut jaetaan palvelujakson päivien mukaan kalenterikuukausille. Samaan dedikoituun palvelimeen liittyvät vuokra-, laitteisto-, kaista-, asennus- ja alennusrivit esitetään yhtenä kustannusryhmänä. Palvelimet ryhmitellään pysyvällä OVH-resurssitunnuksella, ja ryhmän otsikkona näytetään viimeisin laskulta löytyvä käyttäjän antama hostname.
 
-Ensimmäinen asennus tarvitsee verkkoyhteyden Pythonin ja riippuvuuksien lataamiseen. Varsinainen raportin muodostaminen käsittelee laskut paikallisesti eikä lähetä niitä verkkoon.
+Verollisen ja verottoman näkymän voi vaihtaa raportin yläreunan kytkimestä. Suomen yleisen ALV-kannan muutos 24 prosentista 25,5 prosenttiin tarkistetaan 1.9.2024 alkaen. Laskusummat säilytetään aina laskulle merkityn todellisen verokannan mukaisina, ja mahdollinen poikkeama näytetään kyseisen laskun yhteydessä.
 
-## Windows (suositeltu tapa: uv)
+Työkalu tarkistaa jokaisesta laskusta, että laskurivien veroton summa vastaa laskun verotonta loppusummaa ja että veroton summa sekä ALV vastaavat verollista loppusummaa. Tunnistamaton laskurakenne tai täsmäytysvirhe keskeyttää ajon ja ilmoittaa laskun sekä mahdollisuuksien mukaan sivun ja virheellisen kohdan.
+
+## Syöte ja tuloste
+
+Oletuksena työkalu etsii rekursiivisesti kaikki PDF-tiedostot `input/`-hakemistosta ja kirjoittaa raportin `output/`-hakemistoon. PDF:n nimellä tai alihakemiston nimellä ei ole merkitystä, sillä laskutunnus ja muut tiedot luetaan PDF:n sisällöstä.
+
+Tuloste sisältää:
+
+- `output/index.html`: selaimessa avattava raportti
+- `output/report.json`: sama raporttiaineisto koneluettavassa muodossa
+- `output/pdfs/VUOSI/LASKUNUMERO.pdf`: raporttiin linkitetyt lähdelaskut
+
+Raportti ja siihen kopioidut laskut toimivat kokonaan paikallisesti. Laskuja tai niiden tietoja ei lähetetä verkkoon.
+
+Jos sama laskunumero löytyy useasti täysin samalla parsitulla sisällöllä, ensimmäinen säilytetään ja muista tulostetaan varoitus. Jos saman laskunumeron sisältö poikkeaa, ajo keskeytetään ja erot ilmoitetaan.
+
+Työkalu ei käytä tietokantaa tai aiemman ajon tilaa. Jokainen ajo lukee kaikki PDF:t ja rakentaa raportin uudelleen. Vanha `output` korvataan vasta, kun kaikki laskut on parsittu ja validoitu onnistuneesti.
+
+## Asennus ja käyttö
+
+Työkalu vaatii Python 3.11:n tai uudemman. Ensimmäinen asennus tarvitsee verkkoyhteyden Pythonin ja riippuvuuksien lataamiseen.
+
+### Windows (suositeltu tapa: uv)
 
 Suorita seuraavat komennot PowerShellissä projektihakemistossa.
 
@@ -22,7 +44,7 @@ Suorita seuraavat komennot PowerShellissä projektihakemistossa.
    winget install --id=astral-sh.uv -e
    ```
 
-   Sulje PowerShell asennuksen jälkeen, avaa se uudelleen projektihakemistossa ja varmista asennus:
+   Sulje PowerShell asennuksen jälkeen, avaa se uudelleen ja varmista asennus:
 
    ```powershell
    uv --version
@@ -40,17 +62,17 @@ Suorita seuraavat komennot PowerShellissä projektihakemistossa.
    uv run ovh-report
    ```
 
-4. Avaa valmis raportti oletusselaimessa:
+4. Avaa valmis raportti:
 
    ```powershell
    Start-Process .\output\index.html
    ```
 
-Kun lisäät tai poistat laskuja, raportin voi rakentaa uudelleen pelkällä `uv run ovh-report` -komennolla. Ohjelma lukee kaikki PDF:t uudelleen ja korvaa aiemman `output`-hakemiston vasta onnistuneen ajon lopuksi.
+Kun laskuja lisätään tai poistetaan, raportin voi rakentaa uudelleen komennolla `uv run ovh-report`.
 
-### Windows ilman uv:ta
+#### Windows ilman uv:ta
 
-Jos koneessa on jo Python 3.11 tai uudempi, voit käyttää Pythonin omaa virtuaaliympäristöä. Virtuaaliympäristöä ei tarvitse aktivoida, koska alla olevat komennot kutsuvat sen ohjelmia suoraan.
+Jos koneessa on jo Python 3.11 tai uudempi, voit käyttää Pythonin omaa virtuaaliympäristöä. Virtuaaliympäristöä ei tarvitse aktivoida, koska komennot kutsuvat sen ohjelmia suoraan.
 
 PowerShell:
 
@@ -62,7 +84,7 @@ py -m venv .venv
 Start-Process .\output\index.html
 ```
 
-Perinteinen komentokehote (`cmd.exe`):
+Komentokehote (`cmd.exe`):
 
 ```bat
 py --version
@@ -72,16 +94,16 @@ py -m venv .venv
 start "" output\index.html
 ```
 
-Varmista `py --version` -tulosteesta, että käytössä on vähintään Python 3.11. Jos `py`-komentoa tai sopivaa Pythonia ei löydy, asenna vähintään Python 3.11 tai käytä yllä olevaa `uv`-tapaa. Jos juuri asennettua `uv`-komentoa ei löydy, avaa uusi PowerShell-ikkuna, jotta päivittynyt `PATH` tulee käyttöön.
+Varmista `py --version` -tulosteesta, että käytössä on vähintään Python 3.11. Jos `py`-komentoa tai sopivaa Pythonia ei löydy, asenna vähintään Python 3.11 tai käytä `uv`-tapaa. Jos juuri asennettua `uv`-komentoa ei löydy, avaa uusi PowerShell-ikkuna, jotta päivittynyt `PATH` tulee käyttöön.
 
-## Linux ja macOS (uv)
+### Linux ja macOS (uv)
 
 ```bash
 uv sync
 uv run ovh-report
 ```
 
-## Linux ja macOS (venv)
+### Linux ja macOS (venv)
 
 ```bash
 python3.11 -m venv .venv
@@ -89,9 +111,13 @@ python3.11 -m venv .venv
 .venv/bin/ovh-report
 ```
 
-Onnistuneen ajon jälkeen avaa `output/index.html` selaimessa. HTTP-palvelinta tai verkkoyhteyttä ei tarvita. `output/report.json` sisältää saman raporttiaineiston koneluettavassa muodossa. Raporttiin valittu lähde-PDF kopioidaan muuttamattomana polkuun `output/pdfs/VUOSI/LASKUNUMERO.pdf`, jotta laskulinkit toimivat koko output-hakemistoa siirrettäessä.
+Syöte- ja tuloshakemistot voi antaa erikseen:
 
-Oletuksena työkalu etsii rekursiivisesti kaikki PDF-tiedostot `input/`-hakemistosta ja kirjoittaa raportin `output/`-hakemistoon. PDF:n nimellä tai alihakemiston nimellä ei ole merkitystä: laskutunnus ja muut tiedot luetaan aina PDF:n sisällöstä. Jos sama laskunumero löytyy useasti täysin samalla parsitulla sisällöllä, ensimmäinen säilytetään ja muista tulostetaan konsolivaroitus. Jos saman laskunumeron sisältö poikkeaa, ajo keskeytetään ja erot ilmoitetaan. Polut voi edelleen antaa erikseen komennolla `ovh-report MUU_INPUT --output MUU_OUTPUT`. Syöte ja output eivät saa sijaita sisäkkäin. Työkalu ei käytä tietokantaa tai aiemman ajon tilaa: jokainen ajo lukee kaikki PDF:t ja rakentaa koko raportin tyhjästä. Vanha output korvataan vasta, kun kaikki laskut on parsittu ja validoitu. Virhetilanteessa komento palauttaa virhekoodin ja ilmoittaa laskun sekä mahdollisuuksien mukaan sivun ja epäonnistuneen kohdan.
+```bash
+uv run ovh-report MUU_INPUT --output MUU_OUTPUT
+```
+
+Syöte ja tuloste eivät saa sijaita sisäkkäin.
 
 ## Tarkistukset
 
@@ -105,3 +131,11 @@ Testit käsittelevät myös tämän hakemiston koko PDF-aineiston, jos laskut ov
 ## Lisenssi
 
 Tämä projekti on julkaistu [CC0 1.0 Universal](LICENSE) -ehtojen mukaisesti.
+
+## Koko esimerkkiraportti
+
+[![OVHcloud-laskuraportti kokonaisuudessaan](docs/images/ovh-report-demo-full.png)](docs/images/ovh-report-demo-full.png)
+
+## Toteutus
+
+Tämä projekti on tehty täysin tekoälyllä: OpenAI Codex CLI + GPT-5.6-sol-medium.

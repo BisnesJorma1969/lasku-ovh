@@ -1,5 +1,6 @@
 .venv/
 output/
+mock-output/
 input/
 OVHcloud-*.csv
 __pycache__/
