@@ -101,3 +101,7 @@ uv run pytest
 ```
 
 Testit käsittelevät myös tämän hakemiston koko PDF-aineiston, jos laskut ovat saatavilla.
+
+## Lisenssi
+
+Tämä projekti on julkaistu [CC0 1.0 Universal](LICENSE) -ehtojen mukaisesti.
