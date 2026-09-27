@@ -4,8 +4,6 @@ OVHcloud-laskuraportti lukee hakemiston PDF-laskut, täsmäyttää niiden summat
 
 [![OVHcloud-laskuraportin yläosa](docs/images/ovh-report-demo-top.png)](docs/images/ovh-report-demo-full.png)
 
-Kuvissa käytetään synteettistä esimerkkiaineistoa. Summat ja tuoterivit vastaavat todellista hintatasoa, mutta lasku-, palvelin-, hostname- ja IP-tunnisteet eivät ole oikeita.
-
 ## Toimintaperiaate
 
 Palvelumaksut jaetaan palvelujakson päivien mukaan kalenterikuukausille. Samaan dedikoituun palvelimeen liittyvät vuokra-, laitteisto-, kaista-, asennus- ja alennusrivit esitetään yhtenä kustannusryhmänä. Palvelimet ryhmitellään pysyvällä OVH-resurssitunnuksella, ja ryhmän otsikkona näytetään viimeisin laskulta löytyvä käyttäjän antama hostname.
