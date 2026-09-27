@@ -1,0 +1,7 @@
+.venv/
+output/
+input/*.pdf
+OVHcloud-*.csv
+__pycache__/
+.pytest_cache/
+*.egg-info/

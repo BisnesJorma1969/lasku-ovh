@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ovh-invoice-report"
+version = "1.0.0"
+description = "OVHcloud PDF invoice parser and local monthly cost report"
+requires-python = ">=3.11"
+dependencies = [
+  "pypdf==4.0.2",
+  "plotly==6.3.0",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8,<9"]
+
+[project.scripts]
+ovh-report = "ovh_report.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ovh_report"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

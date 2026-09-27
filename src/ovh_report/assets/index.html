@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="fi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>OVHcloud-laskutus</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="hero__content">
+      <div>
+        <p class="eyebrow">OVHCLOUD · LASKURAPORTTI</p>
+        <h1>Laskutus palveluittain</h1>
+        <p id="report-period" class="hero__subtitle"></p>
+      </div>
+      <label class="vat-toggle" for="vat-toggle">
+        <span>ALV 0 %</span>
+        <input id="vat-toggle" type="checkbox" aria-label="Sisällytä arvonlisävero hintoihin">
+        <span class="vat-toggle__track" aria-hidden="true"><span></span></span>
+        <span>Sis. ALV</span>
+      </label>
+    </div>
+  </header>
+
+  <main>
+    <section aria-label="Yhteenveto" class="summary-grid">
+      <article class="metric"><span>Verollinen yhteensä</span><strong id="total-incl">–</strong></article>
+      <article class="metric"><span>Veroton yhteensä</span><strong id="total-excl">–</strong></article>
+      <article class="metric"><span>Arvonlisävero</span><strong id="total-vat">–</strong></article>
+      <article class="metric"><span>Aineisto</span><strong id="source-count">–</strong></article>
+    </section>
+    <section class="panel chart-panel" aria-labelledby="chart-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">PALVELUPÄIVILLE KOHDISTETTU</p>
+          <h2 id="chart-title">Kuukausittainen kokonaislaskutus</h2>
+        </div>
+        <p id="chart-note" class="section-note">Palkki näyttää palveluryhmät ja viiva kokonaiskulun.</p>
+      </div>
+      <div id="billing-chart" class="chart" role="img" aria-label="Kuukausittainen pinottu laskutuskaavio"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="month-title">
+      <div class="section-heading month-heading">
+        <div>
+          <p class="eyebrow">KUUKAUSIERITTELY</p>
+          <h2 id="month-title">Palvelut ja laskurivit</h2>
+        </div>
+        <label class="month-picker">Kuukausi
+          <select id="month-select"></select>
+        </label>
+      </div>
+      <div id="month-totals" class="month-totals"></div>
+      <div id="month-breakdown" class="breakdown"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="invoice-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">TÄSMÄYTETYT LÄHTEET</p>
+          <h2 id="invoice-title">Laskut</h2>
+        </div>
+        <p class="section-note">Alkuperäiset laskusummat laskun päiväyksen mukaan.</p>
+      </div>
+      <div id="invoice-years" class="invoice-years"></div>
+    </section>
+
+    <footer><span id="generated-at"></span><span>Summat euroina · lähde: OVHcloud PDF-laskut</span></footer>
+  </main>
+  <script src="plotly.min.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
